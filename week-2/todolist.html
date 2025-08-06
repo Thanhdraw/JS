@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>To-do List</title>
+    </head>
+    <body>
+        <h2>To-do List</h2>
+
+        <input type="text" id="todo-input" placeholder="Nhập công việc..." />
+        <button id="add-btn">Thêm</button>
+
+        <ul id="todo-list"></ul>
+
+        <script>
+    const todos = [];
+        function addTodo(){
+            const addBtn = document.getElementById('add-btn');
+            addBtn.addEventListener('click',function(){
+                const text = document.getElementById('todo-input').value.trim();
+                if(text){
+                    todos.push({
+                        id: Date.now(),
+                        text: text
+                    });
+            document.getElementById("todo-input").value = ""; 
+            renderTodos(); 
+                }
+          
+            }); 
+        } 
+        addTodo(); 
+        
+        
+        function renderTodos(){
+           const todoList = document.getElementById('todo-list');
+            todoList.innerHTML = ""; 
+           todos.forEach(todo=>{
+            const li = document.createElement('li');
+            li.textContent = todo.text;
+            todoList.appendChild(li);
+           });
+        }
+        renderTodos();
+   
+  </script>
+    </body>
+</html>
