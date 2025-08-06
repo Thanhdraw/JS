@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Giỏ Hàng Đơn Giản</title>
+  </head>
+  <body>
+    
+    <h3>Thêm sản phẩm mới</h3>
+    <input type="text" id="product-name" placeholder="Tên sản phẩm">
+    <input type="number" id="product-price" placeholder="Giá sản phẩm">
+    <button id="add-product">Thêm sản phẩm</button>
+
+    <h2>Danh sách sản phẩm</h2>
+    <input type="text" id="search-input" placeholder="Tìm kiếm sản phẩm...">
+
+    <ul id="product-list"></ul>
+
+    <hr />
+
+    <h2>Giỏ hàng</h2>
+    <ul id="cart-list"></ul>
+    <hr>
+    <h2>Tổng tiền: <strong id="total">0</strong></h2>
+    <script>
+    const products = [
+      { id: 1, name: "Chuột Logitech", price: 350000 },
+      { id: 2, name: "Bàn phím cơ DareU", price: 650000 },
+      { id: 3, name: "Tai nghe Gaming", price: 450000 },
+    ];
+    const cart = [];
+      function renderProductList(productArray = products){
+        const productList = document.getElementById('product-list');
+         productList.innerHTML = ""; // reset
+        productArray.forEach(product => {
+          const li = document.createElement('li');
+          const btnAddcart = document.createElement('button');
+          btnAddcart.textContent = "Add Cart";
+          li.textContent = `${product.name} - ${product.price}`;
+          
+          btnAddcart.addEventListener('click',function(e){
+            e.preventDefault();
+            addToCart(product);
+          }); 
+
+
+          li.appendChild(btnAddcart);
+          productList.appendChild(li);
+        });
+      }
+      renderProductList();
+
+
+
+      function addToCart(product){
+        const index = cart.findIndex(item => item.id === product.id);
+        if(index !== -1){
+          cart[index].quantity += 1;
+        }else{
+          cart.push({...product, quantity: 1});
+        }
+        renderCart();
+      } 
+
+      function removeFromCart(id){
+        const idItem = cart.findIndex(item => item.id === id);
+        if(idItem !==-1){
+          cart.splice(idItem,1);
+        }
+        renderCart();
+      }
+
+
+      function addQuantityItem(id){
+        const index = cart.findIndex(item => item.id ===id);
+        if(index!==-1){
+          cart[index].quantity += 1;
+        }
+        renderCart();
+      }
+
+      function decreaseQuantity(id){
+        const index = cart.findIndex(item => item.id ===id);
+      if(index !== -1){
+        if(cart[index].quantity > 1){
+            cart[index].quantity -=1;
+        }else{
+          const isConfirmed = confirm('Ban muốn xóa ra khỏi gio hàng');
+          if(isConfirmed){
+            removeFromCart(id);
+          }
+        }
+      }
+        renderCart();
+      }
+
+
+      //them san pham
+      function addToProduct(){
+      const addProduct = document.getElementById('add-product');
+      
+        addProduct.addEventListener('click',function(){
+            const name = document.getElementById('product-name').value.trim();
+            const price = parseInt(document.getElementById('product-price').value);
+           
+            const newProduct = {
+              id:Date.now(),
+              name:name,
+              price:price,
+          }
+          products.push(newProduct);
+          document.getElementById('product-list').innerHTML = '';
+          renderProductList();
+          document.getElementById('product-name').value = '';
+          document.getElementById('product-price').value = '';
+        }); 
+      
+      }
+      addToProduct();
+
+      // search product
+      const searchInput = document.getElementById('search-input');
+
+      searchInput.addEventListener('input', function () {
+        const keyword = this.value.toLowerCase();
+        const filteredProducts = products.filter(product =>
+          product.name.toLowerCase().includes(keyword)
+        );
+
+        renderProductList(filteredProducts);
+      });
+
+
+      function renderCart(){
+        const cartList = document.getElementById('cart-list');
+        const totalAllCart = document.getElementById('total');
+        cartList.innerHTML = "";
+        let totalCart = 0;
+        cart.forEach(item => {
+          let totalItem = item.quantity * item.price;
+          const li = document.createElement('li');
+          const btnRemoveCart = document.createElement('button');
+          btnRemoveCart.textContent = "Xóa";
+          li.textContent = `${item.name} - ${item.price} x ${item.quantity} = ${totalItem.toLocaleString() + "VNĐ"}`;
+
+          totalCart += totalItem;
+
+          const btnIncrease = document.createElement('button');
+          btnIncrease.textContent = "+";
+       
+          const btnDecrease = document.createElement('button');
+          btnDecrease.textContent = "-";
+
+          btnRemoveCart.addEventListener('click',function(){
+            const isConfirmed = confirm('Bạn có muốn xóa sản phẩm này khỏi giỏ hàng ?');
+            if(isConfirmed) {
+               removeFromCart(item.id);
+            }
+           
+          });
+
+          btnIncrease.addEventListener('click',function(){
+                addQuantityItem(item.id);
+          });
+
+          btnDecrease.addEventListener('click',function(){
+              decreaseQuantity(item.id);
+          });
+
+
+          li.appendChild(btnIncrease);
+          li.appendChild(btnDecrease);
+          li.appendChild(btnRemoveCart);
+          cartList.appendChild(li);
+        });
+         totalAllCart.textContent = totalCart.toLocaleString() + "VNĐ";
+      }
+
+
+  </script>
+  </body>
+</html>
